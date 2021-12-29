@@ -39,7 +39,9 @@ func PatchInstance(ctx context.Context, i InstanceOpts) {
 	}
 	patchErr := i.Helper.Patch(ctx, i.Object, patchOpts...)
 	if patchErr != nil {
+		log.Info("Checking error type")
 		if apierrors.IsNotFound(patchErr) {
+			log.Info("Object not found, returning", "error", patchErr.Error())
 			return
 		}
 		i.Error = kerrors.NewAggregate([]error{patchErr, i.Error})
