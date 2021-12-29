@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 	"sigs.k8s.io/cluster-api/util/patch"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -38,6 +39,9 @@ func PatchInstance(ctx context.Context, i InstanceOpts) {
 	}
 	patchErr := i.Helper.Patch(ctx, i.Object, patchOpts...)
 	if patchErr != nil {
+		if apierrors.IsNotFound(patchErr) {
+			return
+		}
 		i.Error = kerrors.NewAggregate([]error{patchErr, i.Error})
 		keysAndValues = []interface{}{
 			"requestInfo", i.Request, "controller", i.Controller, "err", i.Error,
