@@ -2,10 +2,10 @@ package controllerlib
 
 import (
 	"context"
+	"strings"
 
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	kerrors "k8s.io/apimachinery/pkg/util/errors"
 	"sigs.k8s.io/cluster-api/util/patch"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -40,7 +40,7 @@ func PatchInstance(ctx context.Context, i InstanceOpts) {
 	patchErr := i.Helper.Patch(ctx, i.Object, patchOpts...)
 	if patchErr != nil {
 		log.Info("Checking error type")
-		if apierrors.IsNotFound(patchErr) {
+		if strings.Contains(patchErr.Error(), "not found") {
 			log.Info("Object not found, returning", "error", patchErr.Error())
 			return
 		}
