@@ -27,6 +27,7 @@ func PatchInstance(ctx context.Context, i InstanceOpts) {
 	}
 
 	if err := i.validate(); err != nil {
+		log.Error(err, "Invalid instance options")
 		return
 	}
 	keysAndValues := []interface{}{
